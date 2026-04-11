@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JVW Ledger — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0f11; --surface: #16181c; --surface2: #1e2028;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+    --text: #eaeaea; --muted: #7a7f8e;
+    --accent: #c8f567; --accent-dim: rgba(200,245,103,0.12); --accent-text: #2a3800;
+    --red: #ff5f5f; --red-dim: rgba(255,95,95,0.12);
+    --font-head: 'Fraunces', serif; --font-mono: 'DM Mono', monospace; --font-body: 'DM Sans', sans-serif;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .card { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; width: 400px; max-width: 95vw; padding: 40px; }
+  .logo-area { text-align: center; margin-bottom: 32px; }
+  .logo-icon { width: 52px; height: 52px; background: var(--accent); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .logo-name { font-family: var(--font-head); font-size: 26px; font-weight: 600; color: var(--accent); letter-spacing: -0.5px; }
+  .logo-sub { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .field label { font-size: 11px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.8px; }
+  .field input { background: var(--bg); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 11px 14px; outline: none; transition: border-color 0.15s; width: 100%; }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  .btn { width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 500; font-family: var(--font-body); cursor: pointer; border: none; outline: none; transition: all 0.15s; margin-top: 8px; }
+  .btn-accent { background: var(--accent); color: var(--accent-text); }
+  .btn-accent:hover { background: #d8ff7a; transform: translateY(-1px); }
+  .btn-accent:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .alert { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-top: 12px; display: none; }
+  .alert.show { display: block; }
+  .alert-error { background: var(--red-dim); border: 1px solid rgba(255,95,95,0.2); color: var(--red); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  .footer-link { text-align: center; font-size: 13px; color: var(--muted); }
+  .footer-link a { color: var(--accent); text-decoration: none; }
+  .footer-link a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-area">
+    <div class="logo-icon">
+      <svg width="28" height="28" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="5" width="16" height="2.5" rx="1.2" fill="#0e0f11"/>
+        <rect x="2" y="9" width="11" height="2.5" rx="1.2" fill="#0e0f11"/>
+        <rect x="2" y="13" width="7" height="2.5" rx="1.2" fill="#0e0f11"/>
+        <path d="M15 10 L18 13 L15 16" stroke="#0e0f11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="logo-name">JVW Ledger</div>
+    <div class="logo-sub">Business Ledger Software</div>
+  </div>
+
+  <div class="field">
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+  </div>
+
+  <button class="btn btn-accent" id="login-btn" onclick="doLogin()">Sign In</button>
+  <div class="alert alert-error" id="error-msg"></div>
+
+  <hr class="divider">
+  <div class="footer-link">
+    Need access? Contact your <strong style="color:var(--text)">Vincent HEHE</strong>
+  </div>
+</div>
+
+<script>
+  // Check if already logged in — redirect to dashboard
+  (function() {
+    try {
+      const u = JSON.parse(localStorage.getItem('jvw_user') || 'null');
+      if (u && u.token) window.location.replace('index.html');
+    } catch(e) {}
+  })();
+
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('username').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('password').focus();
+  });
+
+  async function doLogin() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('login-btn');
+    const errEl    = document.getElementById('error-msg');
+
+    errEl.classList.remove('show');
+
+    if (!username || !password) {
+      errEl.textContent = 'Please enter your username and password.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Signing in…';
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ username, password })
+      });
+
+      if (res.status === 401 || !res.ok) {
+        errEl.textContent = 'Incorrect username or password. Please try again.';
+        errEl.classList.add('show');
+        return;
+      }
+
+      const data = await res.json();
+      localStorage.setItem('jvw_user', JSON.stringify({
+        token:    data.token,
+        username: data.username,
+        role:     data.role
+      }));
+
+      window.location.replace('index.html');
+
+    } catch(e) {
+      errEl.textContent = 'Cannot connect to server. Make sure the app is running.';
+      errEl.classList.add('show');
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'Sign In';
+    }
+  }
+</script>
+</body>
+</html>
