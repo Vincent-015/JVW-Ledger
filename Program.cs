@@ -166,7 +166,13 @@ app.MapPost("/api/accounts", async (Account input, AppDbContext db, HttpContext 
     input.Id = 0; input.CreatedAt = DateTime.UtcNow; input.UpdatedAt = DateTime.UtcNow;
     db.Accounts.Add(input);
     await db.SaveChangesAsync();
-    return Results.Created($"/api/accounts/{input.Id}", input);
+    return Results.Created($"/api/accounts/{input.Id}", new {
+    id          = input.Id,
+    name        = input.Name,
+    type        = input.Type,
+    balance     = input.Balance,
+    createdAt   = input.CreatedAt
+});
 });
 
 app.MapPut("/api/accounts/{id:int}", async (int id, Account input, AppDbContext db, HttpContext ctx) =>
@@ -215,7 +221,16 @@ app.MapPost("/api/transactions", async (Transaction input, AppDbContext db, Http
     account.UpdatedAt = DateTime.UtcNow;
     db.Transactions.Add(input);
     await db.SaveChangesAsync();
-    return Results.Created($"/api/transactions/{input.Id}", input);
+    return Results.Created($"/api/transactions/{input.Id}", new {
+    id          = input.Id,
+    accountId   = input.AccountId,
+    type        = input.Type,
+    amount      = input.Amount,
+    description = input.Description,
+    status      = input.Status,
+    refCode     = input.Ref,
+    createdAt   = input.CreatedAt
+});
 });
 
 app.MapPut("/api/transactions/{id:int}", async (int id, Transaction input, AppDbContext db, HttpContext ctx) =>
@@ -304,7 +319,14 @@ app.MapPost("/api/products", async (Product input, AppDbContext db, HttpContext 
     input.Id = 0; input.CreatedAt = DateTime.UtcNow; input.UpdatedAt = DateTime.UtcNow;
     db.Products.Add(input);
     await db.SaveChangesAsync();
-    return Results.Created($"/api/products/{input.Id}", input);
+    return Results.Created($"/api/products/{input.Id}", new {
+    id          = input.Id,
+    name        = input.Name,
+    description = input.Description,
+    price       = input.Price,
+    stock       = input.Stock,
+    createdAt   = input.CreatedAt
+});
 });
 
 app.MapPut("/api/products/{id:int}", async (int id, Product input, AppDbContext db, HttpContext ctx) =>
@@ -345,7 +367,14 @@ app.MapPost("/api/customers", async (Customer input, AppDbContext db, HttpContex
     input.Id = 0; input.CreatedAt = DateTime.UtcNow; input.UpdatedAt = DateTime.UtcNow;
     db.Customers.Add(input);
     await db.SaveChangesAsync();
-    return Results.Created($"/api/customers/{input.Id}", input);
+    return Results.Created($"/api/customers/{input.Id}", new {
+    id          = input.Id,
+    
+    email       = input.Email,
+    phone       = input.Phone,
+    
+    createdAt   = input.CreatedAt
+});
 });
 
 app.MapPut("/api/customers/{id:int}", async (int id, Customer input, AppDbContext db, HttpContext ctx) =>
