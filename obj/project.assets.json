@@ -2886,11 +2886,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\UU324\\JVW-Ledger\\FinLedger.csproj",
+      "projectUniqueName": "C:\\Users\\UU324\\Desktop\\JVW-Ledger\\FinLedger.csproj",
       "projectName": "FinLedger",
-      "projectPath": "C:\\Users\\UU324\\JVW-Ledger\\FinLedger.csproj",
+      "projectPath": "C:\\Users\\UU324\\Desktop\\JVW-Ledger\\FinLedger.csproj",
       "packagesPath": "C:\\Users\\UU324\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\UU324\\JVW-Ledger\\obj\\",
+      "outputPath": "C:\\Users\\UU324\\Desktop\\JVW-Ledger\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

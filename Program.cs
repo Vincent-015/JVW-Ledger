@@ -300,7 +300,15 @@ app.MapPost("/api/transactions/transfer", async (TransferRequest req, AppDbConte
 
     db.Transactions.AddRange(debit, credit);
     await db.SaveChangesAsync();
-    return Results.Ok(new { debit, credit });
+    return Results.Ok(new
+    {
+        message   = "Transfer Completed",
+        refCode   = @ref,
+        debit   = new { debit.Id, debit.AccountId, debit.Type, debit.Amount, debit.Description, debit.Status, debit.Ref, debit.CreatedAt },
+        credit  = new { credit.Id, credit.AccountId, credit.Type, credit.Amount, credit.Description, credit.Status, credit.Ref, credit.CreatedAt },
+        fromBalance = from.Balance,
+        toBalance   = to.Balance
+    });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════

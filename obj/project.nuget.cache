@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "YE8h5sT2Fe8=",
+  "dgSpecHash": "FvZ2R/h7rbM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\UU324\\JVW-Ledger\\FinLedger.csproj",
+  "projectFilePath": "C:\\Users\\UU324\\Desktop\\JVW-Ledger\\FinLedger.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\UU324\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\UU324\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
