@@ -3,76 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JVW Ledger — Login</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>JVW Ledger — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --bg: #0e0f11; --surface: #16181c; --surface2: #1e2028;
-    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
-    --text: #eaeaea; --muted: #7a7f8e;
-    --accent: #c8f567; --accent-dim: rgba(200,245,103,0.12); --accent-text: #2a3800;
-    --red: #ff5f5f; --red-dim: rgba(255,95,95,0.12);
-    --font-head: 'Fraunces', serif; --font-mono: 'DM Mono', monospace; --font-body: 'DM Sans', sans-serif;
+    --bg:         #0e1a2e;
+    --card:       #1a2744;
+    --card2:      #1e2e50;
+    --cyan:       #00bcd4;
+    --cyan-light: #26c6da;
+    --cyan-dim:   rgba(0,188,212,0.13);
+    --white:      #ffffff;
+    --silver:     #a8bdd0;
+    --smoke:      #6b84a0;
+    --red-dim:    rgba(239,83,80,0.14);
+    --font-sans:  'Plus Jakarta Sans', sans-serif;
+    --font-mono:  'JetBrains Mono', monospace;
   }
-  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-  .card { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; width: 400px; max-width: 95vw; padding: 40px; }
-  .logo-area { text-align: center; margin-bottom: 32px; }
-  .logo-icon { width: 52px; height: 52px; background: var(--accent); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
-  .logo-name { font-family: var(--font-head); font-size: 26px; font-weight: 600; color: var(--accent); letter-spacing: -0.5px; }
-  .logo-sub { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
-  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-  .field label { font-size: 11px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.8px; }
-  .field input { background: var(--bg); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 11px 14px; outline: none; transition: border-color 0.15s; width: 100%; }
-  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-  .btn { width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 500; font-family: var(--font-body); cursor: pointer; border: none; outline: none; transition: all 0.15s; margin-top: 8px; }
-  .btn-accent { background: var(--accent); color: var(--accent-text); }
-  .btn-accent:hover { background: #d8ff7a; transform: translateY(-1px); }
-  .btn-accent:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .alert { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-top: 12px; display: none; }
-  .alert.show { display: block; }
-  .alert-error { background: var(--red-dim); border: 1px solid rgba(255,95,95,0.2); color: var(--red); }
-  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
-  .footer-link { text-align: center; font-size: 13px; color: var(--muted); }
-  .footer-link a { color: var(--accent); text-decoration: none; }
-  .footer-link a:hover { text-decoration: underline; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 90% 70% at 15% 100%, #0a2a4a 0%, transparent 55%),
+      radial-gradient(ellipse 70% 60% at 85%   0%, #0c2040 0%, transparent 50%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Card — solid flat dark, exactly like the reference */
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border-radius: 18px;
+    padding: 38px 36px 34px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Brand */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 26px;
+  }
+
+  .brand-mark {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .brand-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.15;
+  }
+
+  .brand-sub {
+    font-size: 11.5px;
+    color: var(--silver);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* Form header */
+  .form-header { margin-bottom: 26px; }
+
+  .form-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .form-sub {
+    font-size: 13.5px;
+    color: var(--silver);
+  }
+
+  /* Fields */
+  .field { margin-bottom: 16px; }
+
+  .field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .field-input-wrap { position: relative; }
+
+  .field-input-wrap input {
+    width: 100%;
+    background: #ffffff;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: #0f1e35;
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 500;
+    padding: 13px 44px 13px 15px;
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+
+  .field-input-wrap input::placeholder { color: #9ab0c8; font-weight: 400; }
+
+  .field-input-wrap input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(0,188,212,0.2);
+  }
+
+  .field-icon {
+    position: absolute;
+    right: 14px; top: 50%; transform: translateY(-50%);
+    color: #9ab0c8;
+    pointer-events: none;
+  }
+
+  .pw-toggle {
+    position: absolute;
+    right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none;
+    color: #9ab0c8; cursor: pointer; padding: 4px;
+    display: flex; align-items: center;
+    transition: color 0.15s;
+  }
+  .pw-toggle:hover { color: var(--cyan); }
+
+  /* Sign in button */
+  .btn-signin {
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    border: none; border-radius: 10px;
+    background: linear-gradient(90deg, #00bcd4 0%, #00acc1 100%);
+    color: white;
+    font-family: var(--font-sans);
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.3px;
+    transition: opacity 0.18s, transform 0.18s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+
+  .btn-signin:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
+  .btn-signin:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .btn-inner { display: flex; align-items: center; gap: 10px; }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    display: none;
+  }
+  .btn-signin.loading .spinner { display: block; }
+  .btn-signin.loading .btn-text { opacity: 0.85; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Alert */
+  .alert {
+    display: none; align-items: center; gap: 10px;
+    padding: 11px 14px; border-radius: 9px;
+    background: var(--red-dim);
+    border: 1px solid rgba(239,83,80,0.28);
+    font-size: 13px; color: #ff7b7b;
+    margin-top: 14px;
+  }
+  .alert.show { display: flex; }
+  .alert-icon { flex-shrink: 0; }
+
+  /* Footer */
+  .form-footer {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--smoke);
+    font-family: var(--font-mono);
+  }
 </style>
 </head>
 <body>
+
 <div class="card">
-  <div class="logo-area">
-    <div class="logo-icon">
-      <svg width="28" height="28" viewBox="0 0 20 20" fill="none">
-        <rect x="2" y="5" width="16" height="2.5" rx="1.2" fill="#0e0f11"/>
-        <rect x="2" y="9" width="11" height="2.5" rx="1.2" fill="#0e0f11"/>
-        <rect x="2" y="13" width="7" height="2.5" rx="1.2" fill="#0e0f11"/>
-        <path d="M15 10 L18 13 L15 16" stroke="#0e0f11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-mark">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+        <line x1="6" y1="15" x2="10" y2="15"/>
+        <line x1="13" y1="15" x2="16" y2="15"/>
       </svg>
     </div>
-    <div class="logo-name">JVW Ledger</div>
-    <div class="logo-sub">Business Ledger Software</div>
+    <div>
+      <div class="brand-name">JVW Ledger</div>
+      <div class="brand-sub">Business Ledger System</div>
+    </div>
   </div>
 
+  <!-- Header -->
+  <div class="form-header">
+    <h2 class="form-title">Welcome back</h2>
+    <p class="form-sub">Sign in to your admin account to continue</p>
+  </div>
+
+  <!-- Username -->
   <div class="field">
-    <label>Username</label>
-    <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+    <label class="field-label" for="username">Username</label>
+    <div class="field-input-wrap">
+      <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+    </div>
   </div>
+
+  <!-- Password -->
   <div class="field">
-    <label>Password</label>
-    <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+    <label class="field-label" for="password">Password</label>
+    <div class="field-input-wrap">
+      <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+      <button class="pw-toggle" id="pw-toggle" type="button" tabindex="-1" onclick="togglePw()">
+        <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <button class="btn btn-accent" id="login-btn" onclick="doLogin()">Sign In</button>
-  <div class="alert alert-error" id="error-msg"></div>
+  <!-- Button -->
+  <button class="btn-signin" id="login-btn" onclick="doLogin()">
+    <div class="btn-inner">
+      <div class="spinner"></div>
+      <span class="btn-text">Sign In to Dashboard</span>
+    </div>
+  </button>
 
-  <hr class="divider">
-  <div class="footer-link">
-    Need access? Contact<strong style="color:var(--text)">Vincent HEHE</strong>
+  <!-- Error -->
+  <div class="alert" id="error-msg">
+    <svg class="alert-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <div id="error-text"></div>
   </div>
+
+  <!-- Footer -->
+  <div class="form-footer">Default: admin / admin123</div>
+
 </div>
 
 <script>
-  // Check if already logged in — redirect to dashboard
   (function() {
     try {
       const u = JSON.parse(localStorage.getItem('jvw_user') || 'null');
@@ -80,11 +280,21 @@
     } catch(e) {}
   })();
 
-  document.getElementById('password').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doLogin();
-  });
+  function togglePw() {
+    const inp = document.getElementById('password');
+    const ico = document.getElementById('eye-icon');
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    ico.innerHTML = show
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+
   document.getElementById('username').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('password').focus();
+  });
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
   });
 
   async function doLogin() {
@@ -92,46 +302,44 @@
     const password = document.getElementById('password').value;
     const btn      = document.getElementById('login-btn');
     const errEl    = document.getElementById('error-msg');
+    const errTxt   = document.getElementById('error-text');
 
     errEl.classList.remove('show');
 
     if (!username || !password) {
-      errEl.textContent = 'Please enter your username and password.';
+      errTxt.textContent = 'Please enter your username and password.';
       errEl.classList.add('show');
       return;
     }
 
-    btn.disabled    = true;
-    btn.textContent = 'Signing in…';
+    btn.disabled = true;
+    btn.classList.add('loading');
 
     try {
       const res = await fetch('/api/auth/login', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password })
       });
 
       if (res.status === 401 || !res.ok) {
-        errEl.textContent = 'Incorrect username or password. Please try again.';
+        errTxt.textContent = 'Incorrect username or password. Please try again.';
         errEl.classList.add('show');
         return;
       }
 
       const data = await res.json();
       localStorage.setItem('jvw_user', JSON.stringify({
-        token:    data.token,
-        username: data.username,
-        role:     data.role
+        token: data.token, username: data.username, role: data.role
       }));
-
       window.location.replace('index.html');
 
     } catch(e) {
-      errEl.textContent = 'Cannot connect to server. Make sure the app is running.';
+      errTxt.textContent = 'Cannot connect to server. Make sure the application is running.';
       errEl.classList.add('show');
     } finally {
-      btn.disabled    = false;
-      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      btn.classList.remove('loading');
     }
   }
 </script>

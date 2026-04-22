@@ -275,7 +275,7 @@ app.MapPost("/api/transactions/transfer", async (TransferRequest req, AppDbConte
     var debit = new Transaction
     {
         AccountId   = from.Id,
-        Type        = "transfer",
+        Type        = "TRANSFER",
         Amount      = -amt,
         Description = string.IsNullOrWhiteSpace(req.Note) ? $"Transfer to {to.Name}" : req.Note,
         Status      = string.IsNullOrWhiteSpace(req.Status) ? "completed" : req.Status,
@@ -285,7 +285,7 @@ app.MapPost("/api/transactions/transfer", async (TransferRequest req, AppDbConte
     var credit = new Transaction
     {
         AccountId   = to.Id,
-        Type        = "transfer",
+        Type        = "TRANSFER",
         Amount      = amt,
         Description = string.IsNullOrWhiteSpace(req.Note) ? $"Transfer from {from.Name}" : req.Note,
         Status      = string.IsNullOrWhiteSpace(req.Status) ? "completed" : req.Status,

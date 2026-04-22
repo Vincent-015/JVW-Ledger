@@ -3,190 +3,624 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JVW Ledger — CRUD & Transactions</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>JVW Ledger — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0e0f11; --surface: #16181c; --surface2: #1e2028;
-    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
-    --text: #eaeaea; --muted: #7a7f8e;
-    --accent: #c8f567; --accent-dim: rgba(200,245,103,0.12); --accent-text: #2a3800;
-    --red: #ff5f5f; --red-dim: rgba(255,95,95,0.12);
-    --blue: #5ba4f5; --blue-dim: rgba(91,164,245,0.12);
-    --amber: #f5a623; --amber-dim: rgba(245,166,35,0.12);
-    --green: #4cd97b; --green-dim: rgba(76,217,123,0.12);
-    --radius: 10px;
-    --font-head: 'Fraunces', serif; --font-mono: 'DM Mono', monospace; --font-body: 'DM Sans', sans-serif;
+    --bg:         #0e1a2e;
+    --card:       #1a2744;
+    --panel:      #162038;
+    --cyan:       #00bcd4;
+    --cyan-light: #26c6da;
+    --cyan-dim:   rgba(0,188,212,0.13);
+    --cyan-glow:  rgba(0,188,212,0.07);
+    --white:      #ffffff;
+    --silver:     #a8bdd0;
+    --smoke:      #6b84a0;
+    --paper:      #e8f4f8;
+    /* legacy aliases */
+    --navy-deep:  #0e1a2e;
+    --navy:       #1a2744;
+    --navy-mid:   #1e2e50;
+    --off-white:  #e8f4f8;
+    --ink:        #0e1a2e;
+    --ink2:       #1a2744;
+    --ink3:       #1e2e50;
+    --ink4:       #223260;
+    --ink5:       #263870;
+    --gold:       #00bcd4;
+    --gold-light: #26c6da;
+    --gold-dim:   rgba(0,188,212,0.13);
+    --gold-glow:  rgba(0,188,212,0.07);
+    --emerald:    #4caf50;
+    --em-dim:     rgba(76,175,80,0.13);
+    --sapphire:   #42a5f5;
+    --sa-dim:     rgba(66,165,245,0.13);
+    --ruby:       #ef5350;
+    --ru-dim:     rgba(239,83,80,0.13);
+    --amber:      #ffa726;
+    --am-dim:     rgba(255,167,38,0.13);
+    --border:     rgba(255,255,255,0.08);
+    --border2:    rgba(255,255,255,0.12);
+    --sidebar-w:  248px;
+    --font-serif: 'Plus Jakarta Sans', sans-serif;
+    --font-sans:  'Plus Jakarta Sans', sans-serif;
+    --font-mono:  'JetBrains Mono', monospace;
+    --radius:     11px;
   }
-  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
-  .shell { display: flex; min-height: 100vh; width: 100%; }
-  .sidebar { width: 220px; min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); padding: 28px 0; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 10; }
-  .logo { padding: 0 22px 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-  .logo-name { font-family: var(--font-head); font-size: 20px; font-weight: 600; color: var(--accent); letter-spacing: -0.5px; }
-  .logo-sub { font-size: 10px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
-  .nav-label { font-size: 10px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1.2px; padding: 12px 22px 6px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 22px; font-size: 14px; color: var(--muted); cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; font-weight: 400; user-select: none; }
-  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
-  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-dim); font-weight: 500; }
-  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
-  .sidebar-user { padding: 16px 22px; border-top: 1px solid var(--border); margin-top: auto; }
-  .sidebar-user-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-  .sidebar-user-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .sidebar-user-name { font-size: 13px; color: var(--text); font-weight: 500; }
-  .sidebar-role { font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: 10px; margin-top: 2px; display: inline-block; }
-  .role-admin { background: var(--accent-dim); color: var(--accent); }
-  .role-viewer { background: var(--blue-dim); color: var(--blue); }
-  .logout-btn { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,95,95,0.2); border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer; font-family: var(--font-body); white-space: nowrap; }
-  .logout-btn:hover { background: rgba(255,95,95,0.2); }
-  .manage-users-link { display: none; margin-top: 8px; font-size: 12px; color: var(--accent); text-decoration: none; font-family: var(--font-mono); }
-  .manage-users-link:hover { text-decoration: underline; }
-  .db-status { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding: 10px 22px 0; }
-  .db-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
-  .db-dot.error { background: var(--red); }
-  .main { margin-left: 220px; flex: 1; padding: 36px 40px; width: calc(100% - 220px); min-width: 0; }
-  .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; }
-  .page-title { font-family: var(--font-head); font-size: 32px; font-weight: 300; color: var(--text); line-height: 1.1; }
-  .page-title span { font-style: italic; color: var(--accent); }
-  .page-meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
-  .stat-label { font-size: 11px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-  .stat-value { font-family: var(--font-head); font-size: 26px; font-weight: 600; color: var(--text); line-height: 1; }
-  .stat-value.green { color: var(--green); } .stat-value.red { color: var(--red); } .stat-value.blue { color: var(--blue); } .stat-value.amber { color: var(--amber); }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
-  .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .card-title { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text); letter-spacing: 0.3px; }
-  .card-body { padding: 24px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .form-full { grid-column: 1 / -1; }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label { font-size: 11px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.8px; }
-  .field input, .field select, .field textarea { background: var(--bg); border: 1px solid var(--border2); border-radius: 7px; color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.15s; width: 100%; }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-  .field select option { background: #1e2028; }
-  .field textarea { resize: vertical; min-height: 72px; }
-  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 7px; font-size: 13px; font-weight: 500; font-family: var(--font-body); cursor: pointer; transition: all 0.15s; border: none; outline: none; }
-  .btn-accent { background: var(--accent); color: var(--accent-text); }
-  .btn-accent:hover { background: #d8ff7a; transform: translateY(-1px); }
-  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
-  .btn-ghost:hover { color: var(--text); background: var(--surface2); }
-  .btn-red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,95,95,0.2); }
-  .btn-red:hover { background: rgba(255,95,95,0.2); }
-  .btn-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(91,164,245,0.2); }
-  .btn-blue:hover { background: rgba(91,164,245,0.2); }
-  .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 90% 70% at 15% 100%, #0a2a4a 0%, transparent 55%),
+      radial-gradient(ellipse 70% 60% at 85%   0%, #0c2040 0%, transparent 50%);
+    color: var(--silver);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── SIDEBAR ──────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    position: fixed; top: 0; left: 0; bottom: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar::after {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 1px; height: 100%;
+    background: linear-gradient(to bottom, transparent, rgba(0,188,212,0.3) 40%, rgba(0,188,212,0.3) 60%, transparent);
+    pointer-events: none;
+  }
+
+  .sidebar-top {
+    padding: 26px 22px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand { display: flex; align-items: center; gap: 12px; }
+
+  .brand-mark {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #00bcd4, #006d7f);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 3px 14px rgba(0,188,212,0.4);
+  }
+
+  .brand-name {
+    font-size: 16px; font-weight: 700; color: var(--white); line-height: 1;
+  }
+
+  .brand-tag {
+    font-family: var(--font-mono);
+    font-size: 9px; color: var(--cyan-light);
+    letter-spacing: 1.2px; text-transform: uppercase; margin-top: 3px;
+  }
+
+  .nav-section { padding: 16px 0 4px; }
+
+  .nav-label {
+    font-family: var(--font-mono);
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--smoke); opacity: 0.55;
+    padding: 0 22px 8px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 22px;
+    font-size: 13.5px; font-weight: 400;
+    color: var(--smoke);
+    cursor: pointer; transition: all 0.15s;
+    border-left: 2px solid transparent;
+    user-select: none;
+  }
+
+  .nav-item:hover { color: var(--silver); background: rgba(0,188,212,0.05); }
+
+  .nav-item.active {
+    color: var(--cyan);
+    border-left-color: var(--cyan);
+    background: var(--cyan-dim);
+    font-weight: 600;
+  }
+
+  .nav-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.75; }
+  .nav-item.active .nav-icon { opacity: 1; }
+
+  .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding: 16px 22px; }
+
+  .user-chip { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+
+  .user-avatar {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,188,212,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 12px; color: var(--cyan); font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .user-name { font-size: 13px; font-weight: 600; color: var(--white); line-height: 1.2; }
+
+  .role-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 5px;
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.5px;
+    text-transform: uppercase; font-weight: 500; margin-top: 2px;
+  }
+
+  .role-admin  { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,188,212,0.25); }
+  .role-viewer { background: var(--sa-dim); color: var(--sapphire); border: 1px solid rgba(66,165,245,0.2); }
+
+  .logout-btn {
+    width: 100%; padding: 8px;
+    background: transparent;
+    border: 1px solid var(--border2); border-radius: 8px;
+    color: var(--smoke);
+    font-family: var(--font-sans); font-size: 12.5px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s; text-align: center;
+  }
+  .logout-btn:hover { color: #ff7b7b; border-color: rgba(239,83,80,0.35); background: var(--ru-dim); }
+
+  .manage-link {
+    display: none;
+    font-family: var(--font-mono); font-size: 10.5px;
+    color: var(--cyan); text-decoration: none;
+    opacity: 0.7; margin-top: 10px; letter-spacing: 0.5px;
+    transition: opacity 0.15s;
+  }
+  .manage-link:hover { opacity: 1; }
+
+  .db-chip {
+    display: flex; align-items: center; gap: 7px;
+    padding: 8px 22px;
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--smoke); opacity: 0.6;
+    border-top: 1px solid var(--border);
+  }
+
+  .db-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--emerald); box-shadow: 0 0 5px var(--emerald);
+    animation: pulse-dot 2.5s infinite;
+  }
+  .db-dot.error { background: var(--ruby); box-shadow: 0 0 5px var(--ruby); animation: none; }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── MAIN ─────────────────────────────────── */
+  .main {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+    padding: 34px 38px;
+    min-width: 0;
+  }
+
+  .page-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 26px;
+  }
+
+  .page-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 5px; opacity: 0.9;
+  }
+
+  .page-title {
+    font-size: 26px; font-weight: 700; color: var(--white); line-height: 1.2;
+  }
+
+  .page-title em { font-style: normal; color: var(--cyan-light); }
+
+  .page-meta { font-family: var(--font-mono); font-size: 11px; color: var(--smoke); text-align: right; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin-bottom: 26px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; border-radius: 2px 2px 0 0;
+  }
+
+  .stat-card.c-gold::before    { background: var(--cyan); }
+  .stat-card.c-emerald::before { background: var(--emerald); }
+  .stat-card.c-sapphire::before{ background: var(--sapphire); }
+  .stat-card.c-amber::before   { background: var(--amber); }
+
+  .stat-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+  .stat-label {
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--smoke); margin-bottom: 10px;
+  }
+
+  .stat-value { font-size: 24px; font-weight: 700; color: var(--white); line-height: 1; }
+  .stat-value.c-gold     { color: var(--cyan); }
+  .stat-value.c-emerald  { color: var(--emerald); }
+  .stat-value.c-sapphire { color: var(--sapphire); }
+  .stat-value.c-amber    { color: var(--amber); }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden; margin-bottom: 20px;
+  }
+
+  .card-header {
+    padding: 15px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .card-title {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--cyan-light);
+  }
+
+  .card-body { padding: 22px; }
+
+  /* Toolbar */
+  .toolbar { display: flex; gap: 10px; align-items: center; }
+
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border2); border-radius: 9px;
+    color: var(--white);
+    font-family: var(--font-sans); font-size: 13.5px;
+    padding: 9px 14px 9px 38px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-wrap input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px var(--cyan-dim); }
+  .search-wrap input::placeholder { color: var(--smoke); opacity: 0.6; }
+
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--smoke); opacity: 0.5; pointer-events: none; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: 9px;
+    font-size: 13px; font-weight: 600;
+    font-family: var(--font-sans);
+    cursor: pointer; border: none; outline: none;
+    transition: all 0.15s; white-space: nowrap; position: relative;
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, #00bcd4, #0097a7);
+    color: white;
+    box-shadow: 0 4px 18px rgba(0,188,212,0.35);
+  }
+  .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 8px 26px rgba(0,188,212,0.45); }
+
+  .btn-ghost {
+    background: rgba(0,188,212,0.08);
+    border: 1px solid var(--border2); color: var(--cyan-light);
+  }
+  .btn-ghost:hover { background: rgba(0,188,212,0.15); color: white; }
+
+  .btn-ruby {
+    background: var(--ru-dim); color: #ff7b7b;
+    border: 1px solid rgba(239,83,80,0.2);
+  }
+  .btn-ruby:hover { background: rgba(239,83,80,0.22); }
+
+  .btn-sapphire {
+    background: var(--sa-dim); color: var(--sapphire);
+    border: 1px solid rgba(66,165,245,0.2);
+  }
+  .btn-sapphire:hover { background: rgba(66,165,245,0.22); }
+
+  .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 7px; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+  /* Table */
   .tbl-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  thead th { text-align: left; padding: 11px 16px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border); font-weight: 400; }
+  thead th {
+    text-align: left; padding: 11px 16px;
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--smoke);
+    border-bottom: 1px solid var(--border); font-weight: 400;
+  }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
   tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.02); }
-  td { padding: 13px 16px; color: var(--text); vertical-align: middle; }
-  .td-mono { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
-  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-family: var(--font-mono); font-weight: 500; letter-spacing: 0.3px; }
-  .badge-green { background: var(--green-dim); color: var(--green); } .badge-red { background: var(--red-dim); color: var(--red); }
-  .badge-blue { background: var(--blue-dim); color: var(--blue); } .badge-amber { background: var(--amber-dim); color: var(--amber); }
-  .badge-gray { background: rgba(122,127,142,0.15); color: var(--muted); }
-  .action-row { display: flex; gap: 6px; align-items: center; }
-  .toolbar { display: flex; gap: 12px; align-items: center; }
-  .search-wrap { position: relative; flex: 1; }
-  .search-wrap input { background: var(--bg); border: 1px solid var(--border2); border-radius: 7px; color: var(--text); font-family: var(--font-body); font-size: 13.5px; padding: 9px 14px 9px 36px; outline: none; width: 100%; transition: border-color 0.15s; }
-  .search-wrap input:focus { border-color: var(--accent); }
-  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; pointer-events: none; }
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 14px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; animation: slideUp 0.2s ease; }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  .modal-header { padding: 22px 26px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .modal-title { font-family: var(--font-head); font-size: 20px; font-weight: 300; }
-  .modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px; }
-  .modal-close:hover { color: var(--text); }
-  .modal-body { padding: 24px 26px; }
-  .modal-footer { padding: 16px 26px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
-  .toast-container { position: fixed; bottom: 28px; right: 28px; display: flex; flex-direction: column; gap: 10px; z-index: 200; }
-  .toast { background: var(--surface2); border: 1px solid var(--border2); border-radius: 9px; padding: 12px 18px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; animation: toastIn 0.2s ease; max-width: 300px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-  @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-  .toast.success { border-left: 3px solid var(--green); } .toast.error { border-left: 3px solid var(--red); }
-  .toast.info { border-left: 3px solid var(--blue); } .toast.warning { border-left: 3px solid var(--amber); }
-  .amount-positive { color: var(--green); font-family: var(--font-mono); }
-  .amount-negative { color: var(--red); font-family: var(--font-mono); }
-  .page-section { display: none; } .page-section.active { display: block; }
+  tbody tr:hover { background: rgba(0,188,212,0.04); }
+  td { padding: 13px 16px; color: var(--silver); vertical-align: middle; }
+  .td-mono { font-family: var(--font-mono); font-size: 12px; color: var(--smoke); }
+  .td-strong { font-weight: 600; color: var(--white); }
+
+  /* Badges */
+  .badge {
+    display: inline-block; padding: 3px 9px; border-radius: 5px;
+    font-size: 11px; font-family: var(--font-mono); font-weight: 500; letter-spacing: 0.3px;
+  }
+  .badge-emerald { background: var(--em-dim); color: var(--emerald); }
+  .badge-ruby    { background: var(--ru-dim); color: #ff7b7b; }
+  .badge-sapphire{ background: var(--sa-dim); color: var(--sapphire); }
+  .badge-amber   { background: var(--am-dim); color: var(--amber); }
+  .badge-gold    { background: var(--cyan-dim); color: var(--cyan); }
+  .badge-smoke   { background: rgba(106,138,170,0.12); color: var(--smoke); }
+
+  .amount-pos { color: var(--emerald); font-family: var(--font-mono); font-size: 13px; }
+  .amount-neg { color: #ff7b7b; font-family: var(--font-mono); font-size: 13px; }
+
+  .filter-select {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 9px; color: var(--white);
+    font-family: var(--font-sans); font-size: 13px;
+    padding: 8px 14px; outline: none; cursor: pointer; transition: border-color 0.15s;
+  }
+  .filter-select:focus { border-color: var(--cyan); }
+  .filter-select option { background: #1a3358; }
+
+  /* Pages */
+  .page-section { display: none; }
+  .page-section.active { display: block; }
+
+  /* Empty state */
   .empty-state { text-align: center; padding: 48px 24px; }
-  .empty-icon { font-size: 36px; margin-bottom: 12px; }
-  .empty-title { font-family: var(--font-head); font-size: 18px; font-weight: 300; color: var(--muted); margin-bottom: 6px; }
-  .empty-sub { font-size: 13px; color: var(--muted); }
-  .confirm-text { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 6px; }
-  .confirm-name { font-family: var(--font-mono); color: var(--text); background: var(--surface2); padding: 8px 14px; border-radius: 6px; font-size: 13px; margin-top: 10px; display: inline-block; }
-  .ledger-ref { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-  .viewer-notice { background: var(--blue-dim); border: 1px solid rgba(91,164,245,0.2); border-radius: 8px; padding: 10px 16px; font-size: 13px; color: var(--blue); margin-bottom: 20px; display: none; }
+  .empty-icon { font-size: 28px; margin-bottom: 10px; opacity: 0.3; }
+  .empty-title { font-size: 17px; font-weight: 500; color: var(--smoke); margin-bottom: 5px; }
+  .empty-sub { font-size: 13px; color: var(--smoke); opacity: 0.6; }
+
+  /* Viewer notice */
+  .viewer-notice {
+    display: none;
+    background: var(--sa-dim); border: 1px solid rgba(66,165,245,0.2);
+    border-radius: 9px; padding: 10px 16px;
+    font-size: 13px; color: var(--sapphire); margin-bottom: 22px;
+  }
+
+  .action-row { display: flex; gap: 6px; align-items: center; }
+  .ledger-ref { font-family: var(--font-mono); font-size: 11px; color: var(--smoke); }
+
+  /* ── MODALS ───────────────────────────────── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(5,12,26,0.75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 100; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+    animation: modalUp 0.24s cubic-bezier(.16,1,.3,1); position: relative;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.5);
+  }
+
+  .modal::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent 5%, var(--cyan) 40%, var(--cyan-light) 60%, transparent 95%);
+    border-radius: 16px 16px 0 0;
+  }
+
+  @keyframes modalUp { from { opacity:0; transform:translateY(24px) scale(0.96); } to { opacity:1; transform:none; } }
+
+  .modal-header {
+    padding: 22px 28px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .modal-title { font-size: 20px; font-weight: 700; color: var(--white); letter-spacing: -0.2px; }
+
+  .modal-close {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: var(--smoke);
+    font-size: 16px; cursor: pointer; padding: 5px 9px;
+    border-radius: 8px; transition: all 0.15s; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { color: var(--white); background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
+
+  .modal-body { padding: 24px 28px; }
+  .modal-footer {
+    padding: 18px 28px; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 10px;
+  }
+
+  /* Form fields */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .form-full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--smoke); font-weight: 500;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    background: rgba(255,255,255,0.92);
+    border: 2px solid transparent; border-radius: 10px;
+    color: #0f1e35;
+    font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+    padding: 10px 13px; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s; width: 100%;
+  }
+  .field input::placeholder, .field textarea::placeholder { color: #9bb0c4; font-weight: 400; }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(0,188,212,0.16); }
+  .field select option { background: #1a3358; color: white; }
+  .field textarea { resize: vertical; min-height: 72px; }
+
+  /* Modal-specific button overrides */
+  .modal-footer .btn-ghost {
+    background: #253558;
+    border: 1px solid var(--border);
+    color: var(--silver);
+    padding: 10px 22px; font-size: 14px; border-radius: 10px;
+  }
+  .modal-footer .btn-ghost:hover { background: #2d3f6a; color: white; }
+
+  .modal-footer .btn-gold {
+    padding: 10px 22px; font-size: 14px; border-radius: 10px;
+    background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+    box-shadow: 0 4px 18px rgba(0,188,212,0.45), 0 1px 0 rgba(255,255,255,0.15) inset;
+    letter-spacing: 0.2px;
+  }
+  .modal-footer .btn-gold:hover { box-shadow: 0 8px 28px rgba(0,188,212,0.55); transform: translateY(-1px); }
+
+  .modal-footer .btn-ruby { padding: 10px 22px; font-size: 14px; border-radius: 10px; }
+
+  /* Confirm */
+  .confirm-text { font-size: 13.5px; color: var(--smoke); line-height: 1.6; margin-bottom: 5px; }
+  .confirm-name {
+    font-family: var(--font-mono); color: var(--white);
+    background: var(--panel); padding: 9px 14px;
+    border-radius: 8px; font-size: 13px; margin-top: 10px; display: inline-block;
+    border: 1px solid var(--border);
+  }
+
+  /* ── SPINNER for buttons ── */
+  .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+    border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
+  }
+  .btn.loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ────────────────────────────────── */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 200; }
+
+  .toast {
+    background: var(--card);
+    border: 1px solid var(--border); border-radius: 11px;
+    padding: 12px 18px; font-size: 13.5px;
+    display: flex; align-items: center; gap: 10px;
+    animation: toastIn 0.22s cubic-bezier(.16,1,.3,1);
+    max-width: 310px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  @keyframes toastIn { from { opacity:0; transform:translateX(16px); } to { opacity:1; transform:none; } }
+
+  .toast.success { border-left: 3px solid var(--emerald); }
+  .toast.error   { border-left: 3px solid var(--ruby); }
+  .toast.info    { border-left: 3px solid var(--sapphire); }
+  .toast.warning { border-left: 3px solid var(--amber); }
 </style>
 </head>
 <body>
-<div class="shell">
-  <!-- SIDEBAR -->
+<div style="display:flex;">
+
+  <!-- ── SIDEBAR ──────────────────────────────── -->
   <aside class="sidebar">
-    <div class="logo">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-            <rect x="2" y="5" width="16" height="2.5" rx="1.2" fill="#0e0f11"/>
-            <rect x="2" y="9" width="11" height="2.5" rx="1.2" fill="#0e0f11"/>
-            <rect x="2" y="13" width="7" height="2.5" rx="1.2" fill="#0e0f11"/>
-            <path d="M15 10 L18 13 L15 16" stroke="#0e0f11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <div class="sidebar-top">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <line x1="6" y1="15" x2="10" y2="15"/>
+            <line x1="13" y1="15" x2="16" y2="15"/>
           </svg>
         </div>
         <div>
-          <div class="logo-name">JVW Ledger</div>
-          <div class="logo-sub">Business Ledger Software</div>
+          <div class="brand-name">JVW Ledger</div>
+          <div class="brand-tag">Business System</div>
         </div>
       </div>
     </div>
 
-    <div class="nav-label">Management</div>
-    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">⬡</span> Dashboard</div>
-    <div class="nav-item" onclick="showPage('accounts')"><span class="nav-icon">◈</span> Accounts</div>
-    <div class="nav-item" onclick="showPage('transactions')"><span class="nav-icon">⇄</span> Transactions</div>
-    <div class="nav-label">Records</div>
-    <div class="nav-item" onclick="showPage('products')"><span class="nav-icon">◻</span> Products</div>
-    <div class="nav-item" onclick="showPage('customers')"><span class="nav-icon">◯</span> Customers</div>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span>
+        Dashboard
+      </div>
+    </div>
 
-    <div class="sidebar-user">
-      <div class="sidebar-user-label">Signed in as</div>
-      <div class="sidebar-user-row">
+    <div class="nav-section">
+      <div class="nav-label">Finance</div>
+      <div class="nav-item" onclick="showPage('accounts')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+        Accounts
+      </div>
+      <div class="nav-item" onclick="showPage('transactions')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></span>
+        Transactions
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Records</div>
+      <div class="nav-item" onclick="showPage('products')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>
+        Products
+      </div>
+      <div class="nav-item" onclick="showPage('customers')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        Customers
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar" id="sidebar-avatar">—</div>
         <div>
-          <div class="sidebar-user-name" id="sidebar-username"></div>
-          <span class="sidebar-role" id="sidebar-role"></span>
+          <div class="user-name" id="sidebar-username"></div>
+          <span class="role-badge" id="sidebar-role"></span>
         </div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
-      <a href="register.html" class="manage-users-link" id="manage-users-link">+ Manage Users</a>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+      <a href="register.html" class="manage-link" id="manage-users-link">⊕ Manage Users</a>
     </div>
 
-    <div class="db-status">
+    <div class="db-chip">
       <span class="db-dot" id="db-dot"></span>
       <span id="db-status-text">SQLite connected</span>
     </div>
   </aside>
 
+  <!-- ── MAIN ─────────────────────────────────── -->
   <main class="main">
 
     <!-- DASHBOARD -->
     <div id="page-dashboard" class="page-section active">
       <div class="page-header">
         <div>
-          <div class="page-title">Welcome to <span>JVW Ledger</span></div>
-          <div style="font-size:13px;color:var(--muted);margin-top:4px;">Your all-in-one business ledger and inventory system</div>
+          <div class="page-eyebrow">Overview</div>
+          <div class="page-title">Welcome to <em>JVW Ledger</em></div>
         </div>
         <div class="page-meta" id="db-stats-label">Loading…</div>
       </div>
-      <div class="viewer-notice" id="viewer-notice">You are logged in as a <strong>Viewer</strong>. You can view all data but cannot add, edit, or delete records.</div>
+      <div class="viewer-notice" id="viewer-notice">You are signed in as a <strong>Viewer</strong>. You can view all records but cannot add, edit, or delete.</div>
       <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Total Accounts</div><div class="stat-value blue" id="stat-accounts">—</div></div>
-        <div class="stat-card"><div class="stat-label">Total Balance</div><div class="stat-value green" id="stat-balance">—</div></div>
-        <div class="stat-card"><div class="stat-label">Transactions</div><div class="stat-value amber" id="stat-txns">—</div></div>
-        <div class="stat-card"><div class="stat-label">Products</div><div class="stat-value" id="stat-products">—</div></div>
+        <div class="stat-card c-sapphire"><div class="stat-label">Total Accounts</div><div class="stat-value c-sapphire" id="stat-accounts">—</div></div>
+        <div class="stat-card c-emerald"><div class="stat-label">Total Balance</div><div class="stat-value c-emerald" id="stat-balance">—</div></div>
+        <div class="stat-card c-amber"><div class="stat-label">Transactions</div><div class="stat-value c-amber" id="stat-txns">—</div></div>
+        <div class="stat-card c-gold"><div class="stat-label">Products</div><div class="stat-value c-gold" id="stat-products">—</div></div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -205,13 +639,19 @@
     <!-- ACCOUNTS -->
     <div id="page-accounts" class="page-section">
       <div class="page-header">
-        <div class="page-title">Accounts</div>
-        <button class="btn btn-accent admin-only" onclick="openModal('account-modal'); resetAccountForm()">+ New Account</button>
+        <div>
+          <div class="page-eyebrow">Finance</div>
+          <div class="page-title">Accounts</div>
+        </div>
+        <button class="btn btn-gold admin-only" onclick="openModal('account-modal'); resetAccountForm()">+ New Account</button>
       </div>
       <div class="card">
         <div class="card-header">
           <div class="toolbar">
-            <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="account-search" placeholder="Search accounts…" oninput="renderAccounts()"></div>
+            <div class="search-wrap">
+              <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="text" id="account-search" placeholder="Search accounts…" oninput="renderAccounts()">
+            </div>
           </div>
         </div>
         <div class="tbl-wrap">
@@ -226,22 +666,31 @@
     <!-- TRANSACTIONS -->
     <div id="page-transactions" class="page-section">
       <div class="page-header">
-        <div class="page-title">Transactions</div>
+        <div>
+          <div class="page-eyebrow">Finance</div>
+          <div class="page-title">Transactions</div>
+        </div>
         <div style="display:flex;gap:10px;">
-          <button class="btn btn-ghost admin-only" onclick="openModal('transfer-modal')">⇄ Transfer</button>
-          <button class="btn btn-accent admin-only" onclick="openModal('txn-modal'); resetTxnForm()">+ New Transaction</button>
+          <button class="btn btn-ghost admin-only" onclick="openModal('transfer-modal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+            Transfer
+          </button>
+          <button class="btn btn-gold admin-only" onclick="openModal('txn-modal'); resetTxnForm()">+ New Transaction</button>
         </div>
       </div>
       <div class="card">
         <div class="card-header">
           <div class="toolbar">
-            <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="txn-search" placeholder="Search transactions…" oninput="renderTransactions()"></div>
-            <select id="txn-filter" onchange="renderTransactions()" style="background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--text);padding:9px 14px;font-size:13px;font-family:var(--font-body);outline:none;">
+            <div class="search-wrap">
+              <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="text" id="txn-search" placeholder="Search transactions…" oninput="renderTransactions()">
+            </div>
+            <select id="txn-filter" class="filter-select" onchange="renderTransactions()">
               <option value="">All Types</option>
-              <option value="deposit">Deposit</option>
-              <option value="withdrawal">Withdrawal</option>
-              <option value="transfer">Transfer</option>
-              <option value="payment">Payment</option>
+              <option value="DEPOSIT">Deposit</option>
+              <option value="wITHDRAWAL">Withdrawal</option>
+              <option value="TRANSFER">Transfer</option>
+              <option value="PAYMENT">Payment</option>
             </select>
           </div>
         </div>
@@ -257,13 +706,19 @@
     <!-- PRODUCTS -->
     <div id="page-products" class="page-section">
       <div class="page-header">
-        <div class="page-title">Products</div>
-        <button class="btn btn-accent admin-only" onclick="openModal('product-modal'); resetProductForm()">+ New Product</button>
+        <div>
+          <div class="page-eyebrow">Records</div>
+          <div class="page-title">Products</div>
+        </div>
+        <button class="btn btn-gold admin-only" onclick="openModal('product-modal'); resetProductForm()">+ New Product</button>
       </div>
       <div class="card">
         <div class="card-header">
           <div class="toolbar">
-            <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="product-search" placeholder="Search products…" oninput="renderProducts()"></div>
+            <div class="search-wrap">
+              <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="text" id="product-search" placeholder="Search products…" oninput="renderProducts()">
+            </div>
           </div>
         </div>
         <div class="tbl-wrap">
@@ -278,13 +733,19 @@
     <!-- CUSTOMERS -->
     <div id="page-customers" class="page-section">
       <div class="page-header">
-        <div class="page-title">Customers</div>
-        <button class="btn btn-accent admin-only" onclick="openModal('customer-modal'); resetCustomerForm()">+ New Customer</button>
+        <div>
+          <div class="page-eyebrow">Records</div>
+          <div class="page-title">Customers</div>
+        </div>
+        <button class="btn btn-gold admin-only" onclick="openModal('customer-modal'); resetCustomerForm()">+ New Customer</button>
       </div>
       <div class="card">
         <div class="card-header">
           <div class="toolbar">
-            <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="customer-search" placeholder="Search customers…" oninput="renderCustomers()"></div>
+            <div class="search-wrap">
+              <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="text" id="customer-search" placeholder="Search customers…" oninput="renderCustomers()">
+            </div>
           </div>
         </div>
         <div class="tbl-wrap">
@@ -299,6 +760,7 @@
   </main>
 </div>
 
+<!-- TOAST -->
 <div class="toast-container" id="toast-container"></div>
 
 <!-- ACCOUNT MODAL -->
@@ -313,7 +775,7 @@
         <div class="field form-full"><label>Description</label><textarea id="acc-desc" placeholder="Optional description…"></textarea></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('account-modal')">Cancel</button><button class="btn btn-accent" id="btn-save-account" onclick="saveAccount()">Save Account</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('account-modal')">Cancel</button><button class="btn btn-gold" id="btn-save-account" onclick="saveAccount()">Save Account</button></div>
   </div>
 </div>
 
@@ -330,7 +792,7 @@
         <div class="field form-full"><label>Description</label><input type="text" id="txn-desc" placeholder="Transaction description…"></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('txn-modal')">Cancel</button><button class="btn btn-accent" id="btn-save-txn" onclick="saveTransaction()">Post Transaction</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('txn-modal')">Cancel</button><button class="btn btn-gold" id="btn-save-txn" onclick="saveTransaction()">Post Transaction</button></div>
   </div>
 </div>
 
@@ -347,7 +809,7 @@
         <div class="field form-full"><label>Note</label><input type="text" id="transfer-note" placeholder="Transfer note…"></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('transfer-modal')">Cancel</button><button class="btn btn-accent" id="btn-save-transfer" onclick="doTransfer()">Execute Transfer</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('transfer-modal')">Cancel</button><button class="btn btn-gold" id="btn-save-transfer" onclick="doTransfer()">Execute Transfer</button></div>
   </div>
 </div>
 
@@ -365,7 +827,7 @@
         <div class="field form-full"><label>Description</label><textarea id="prod-desc" placeholder="Product description…"></textarea></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('product-modal')">Cancel</button><button class="btn btn-accent" id="btn-save-product" onclick="saveProduct()">Save Product</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('product-modal')">Cancel</button><button class="btn btn-gold" id="btn-save-product" onclick="saveProduct()">Save Product</button></div>
   </div>
 </div>
 
@@ -382,57 +844,48 @@
         <div class="field"><label>City</label><input type="text" id="cust-city" placeholder="Cebu City"></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('customer-modal')">Cancel</button><button class="btn btn-accent" id="btn-save-customer" onclick="saveCustomer()">Save Customer</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('customer-modal')">Cancel</button><button class="btn btn-gold" id="btn-save-customer" onclick="saveCustomer()">Save Customer</button></div>
   </div>
 </div>
 
 <!-- DELETE CONFIRM MODAL -->
 <div class="modal-overlay" id="confirm-modal">
   <div class="modal" style="width:420px;">
-    <div class="modal-header"><span class="modal-title" style="color:var(--red);">Confirm Delete</span><button class="modal-close" onclick="closeModal('confirm-modal')">✕</button></div>
+    <div class="modal-header"><span class="modal-title" style="color:var(--ruby);">Confirm Delete</span><button class="modal-close" onclick="closeModal('confirm-modal')">✕</button></div>
     <div class="modal-body">
       <p class="confirm-text">This action is permanent and cannot be undone.</p>
       <p class="confirm-text">You are about to delete:</p>
       <div class="confirm-name" id="confirm-name"></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('confirm-modal')">Cancel</button><button class="btn btn-red" id="confirm-ok">Delete</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('confirm-modal')">Cancel</button><button class="btn btn-ruby" id="confirm-ok">Delete</button></div>
   </div>
 </div>
 
 <script>
-// ==================== AUTH GUARD ====================
+// ==================== AUTH ====================
 const __user = (function() {
   try { return JSON.parse(localStorage.getItem('jvw_user') || 'null'); } catch(e) { return null; }
 })();
-
-if (!__user || !__user.token) {
-  window.location.replace('login.html');
-}
+if (!__user || !__user.token) window.location.replace('login.html');
 
 const ROLE     = __user ? __user.role     : 'viewer';
 const USERNAME = __user ? __user.username : '';
 
-// Apply role-based UI
 document.addEventListener('DOMContentLoaded', () => {
-  // Sidebar user info
   const unEl = document.getElementById('sidebar-username');
   const rbEl = document.getElementById('sidebar-role');
+  const avEl = document.getElementById('sidebar-avatar');
   const muEl = document.getElementById('manage-users-link');
   if (unEl) unEl.textContent = USERNAME;
+  if (avEl) avEl.textContent = USERNAME.substring(0,2).toUpperCase();
   if (rbEl) {
-    rbEl.textContent  = ROLE;
-    rbEl.className    = 'sidebar-role ' + (ROLE === 'admin' ? 'role-admin' : 'role-viewer');
+    rbEl.textContent = ROLE;
+    rbEl.className   = 'role-badge role-' + ROLE;
   }
   if (muEl && ROLE === 'admin') muEl.style.display = 'block';
-
-  // Show viewer notice
   if (ROLE !== 'admin') {
     const notice = document.getElementById('viewer-notice');
     if (notice) notice.style.display = 'block';
-  }
-
-  // Hide admin-only elements for viewers
-  if (ROLE !== 'admin') {
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
   }
 });
@@ -442,22 +895,14 @@ function logout() {
   window.location.replace('login.html');
 }
 
-// ==================== API LAYER ====================
+// ==================== API ====================
 const API = '';
-
 async function apiFetch(path, options = {}) {
   const res = await fetch(API + path, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-User-Role':  ROLE,
-      ...options.headers
-    },
+    headers: { 'Content-Type': 'application/json', 'X-User-Role': ROLE, ...options.headers },
     ...options
   });
-  if (!res.ok) {
-    const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || `HTTP ${res.status}`);
-  }
+  if (!res.ok) { const text = await res.text().catch(() => res.statusText); throw new Error(text || `HTTP ${res.status}`); }
   if (res.status === 204) return null;
   return res.json();
 }
@@ -465,30 +910,25 @@ async function apiFetch(path, options = {}) {
 const api = {
   getAccounts:      ()      => apiFetch('/api/accounts'),
   getAccount:       (id)    => apiFetch(`/api/accounts/${id}`),
-  createAccount:    (data)  => apiFetch('/api/accounts',     { method: 'POST',   body: JSON.stringify(data) }),
-  updateAccount:    (id, d) => apiFetch(`/api/accounts/${id}`, { method: 'PUT',  body: JSON.stringify(d) }),
-  deleteAccount:    (id)    => apiFetch(`/api/accounts/${id}`, { method: 'DELETE' }),
-
+  createAccount:    (data)  => apiFetch('/api/accounts',     { method:'POST',   body:JSON.stringify(data) }),
+  updateAccount:    (id, d) => apiFetch(`/api/accounts/${id}`, { method:'PUT',  body:JSON.stringify(d) }),
+  deleteAccount:    (id)    => apiFetch(`/api/accounts/${id}`, { method:'DELETE' }),
   getTransactions:  (type)  => apiFetch('/api/transactions' + (type ? `?type=${type}` : '')),
-  createTransaction:(data)  => apiFetch('/api/transactions',  { method: 'POST',   body: JSON.stringify(data) }),
-  updateTransaction:(id, d) => apiFetch(`/api/transactions/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
-  deleteTransaction:(id)    => apiFetch(`/api/transactions/${id}`, { method: 'DELETE' }),
-  transfer:         (data)  => apiFetch('/api/transactions/transfer', { method: 'POST', body: JSON.stringify(data) }),
-
+  createTransaction:(data)  => apiFetch('/api/transactions',  { method:'POST',   body:JSON.stringify(data) }),
+  updateTransaction:(id, d) => apiFetch(`/api/transactions/${id}`, { method:'PUT', body:JSON.stringify(d) }),
+  deleteTransaction:(id)    => apiFetch(`/api/transactions/${id}`, { method:'DELETE' }),
+  transfer:         (data)  => apiFetch('/api/transactions/transfer', { method:'POST', body:JSON.stringify(data) }),
   getProducts:      ()      => apiFetch('/api/products'),
-  createProduct:    (data)  => apiFetch('/api/products',     { method: 'POST',   body: JSON.stringify(data) }),
-  updateProduct:    (id, d) => apiFetch(`/api/products/${id}`, { method: 'PUT',  body: JSON.stringify(d) }),
-  deleteProduct:    (id)    => apiFetch(`/api/products/${id}`, { method: 'DELETE' }),
-
+  createProduct:    (data)  => apiFetch('/api/products',     { method:'POST',   body:JSON.stringify(data) }),
+  updateProduct:    (id, d) => apiFetch(`/api/products/${id}`, { method:'PUT',  body:JSON.stringify(d) }),
+  deleteProduct:    (id)    => apiFetch(`/api/products/${id}`, { method:'DELETE' }),
   getCustomers:     ()      => apiFetch('/api/customers'),
-  createCustomer:   (data)  => apiFetch('/api/customers',    { method: 'POST',   body: JSON.stringify(data) }),
-  updateCustomer:   (id, d) => apiFetch(`/api/customers/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
-  deleteCustomer:   (id)    => apiFetch(`/api/customers/${id}`, { method: 'DELETE' }),
-
+  createCustomer:   (data)  => apiFetch('/api/customers',    { method:'POST',   body:JSON.stringify(data) }),
+  updateCustomer:   (id, d) => apiFetch(`/api/customers/${id}`, { method:'PUT', body:JSON.stringify(d) }),
+  deleteCustomer:   (id)    => apiFetch(`/api/customers/${id}`, { method:'DELETE' }),
   getStats:         ()      => apiFetch('/api/stats'),
 };
 
-// ==================== STATE ====================
 let editingId = {};
 
 // ==================== NAVIGATION ====================
@@ -524,19 +964,25 @@ function toast(msg, type = 'success') {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
   t.className = `toast ${type}`;
-  const icons = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' };
-  const col   = type === 'success' ? 'green' : type === 'error' ? 'red' : type === 'warning' ? 'amber' : 'blue';
-  t.innerHTML = `<span style="color:var(--${col})">${icons[type]||'•'}</span> ${msg}`;
+  const icons = { success:'✓', error:'✕', info:'ℹ', warning:'⚠' };
+  const cols  = { success:'var(--emerald)', error:'var(--ruby)', info:'var(--sapphire)', warning:'var(--amber)' };
+  t.innerHTML = `<span style="color:${cols[type]||cols.info}">${icons[type]||'•'}</span> ${msg}`;
   c.appendChild(t);
-  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 3000);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 3200);
 }
 
 // ==================== FORMATTING ====================
 function fmt(n) { return '₱' + Number(n||0).toLocaleString('en-PH', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
 function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }); }
 function badge(val) {
-  const map = { completed:'green', pending:'amber', failed:'red', deposit:'green', withdrawal:'red', transfer:'blue', payment:'amber', active:'green', inactive:'gray', savings:'blue', checking:'amber', business:'green', investment:'blue', electronics:'blue', clothing:'amber', food:'green', services:'blue', other:'gray' };
-  return `<span class="badge badge-${map[val]||'gray'}">${val}</span>`;
+  const map = {
+    completed:'emerald', pending:'amber', failed:'ruby',
+    deposit:'emerald', withdrawal:'ruby', transfer:'sapphire', payment:'amber',
+    active:'emerald', inactive:'smoke',
+    savings:'sapphire', checking:'amber', business:'emerald', investment:'gold',
+    electronics:'sapphire', clothing:'amber', food:'emerald', services:'gold', other:'smoke'
+  };
+  return `<span class="badge badge-${map[val]||'smoke'}">${val}</span>`;
 }
 function setLoading(btnId, loading) {
   const btn = document.getElementById(btnId);
@@ -553,11 +999,10 @@ function resetAccountForm() {
   document.getElementById('account-modal-title').textContent = 'New Account';
   editingId['account-modal'] = null;
 }
-
 async function saveAccount() {
-  const name        = document.getElementById('acc-name').value.trim();
-  const type        = document.getElementById('acc-type').value;
-  const balance     = parseFloat(document.getElementById('acc-balance').value) || 0;
+  const name = document.getElementById('acc-name').value.trim();
+  const type = document.getElementById('acc-type').value;
+  const balance = parseFloat(document.getElementById('acc-balance').value) || 0;
   const description = document.getElementById('acc-desc').value.trim() || null;
   if (!name) { toast('Account name is required', 'error'); return; }
   setLoading('btn-save-account', true);
@@ -569,9 +1014,8 @@ async function saveAccount() {
   } catch(e) { toast('Error: ' + e.message, 'error'); }
   finally { setLoading('btn-save-account', false); }
 }
-
 async function renderAccounts() {
-  const q     = document.getElementById('account-search')?.value.toLowerCase() || '';
+  const q = document.getElementById('account-search')?.value.toLowerCase() || '';
   const tbody = document.getElementById('account-list');
   try {
     const data = (await api.getAccounts()).filter(a => a.name.toLowerCase().includes(q) || a.type.includes(q));
@@ -579,19 +1023,18 @@ async function renderAccounts() {
     tbody.innerHTML = data.map(a => `
       <tr>
         <td class="td-mono">#${a.id}</td>
-        <td style="font-weight:500">${a.name}</td>
+        <td class="td-strong">${a.name}</td>
         <td>${badge(a.type)}</td>
-        <td class="${a.balance>=0?'amount-positive':'amount-negative'}">${fmt(a.balance)}</td>
+        <td class="${a.balance>=0?'amount-pos':'amount-neg'}">${fmt(a.balance)}</td>
         <td class="td-mono">${fmtDate(a.createdAt)}</td>
         <td class="admin-only"><div class="action-row">
-          <button class="btn btn-blue btn-sm" onclick="editAccount(${a.id})">Edit</button>
-          <button class="btn btn-red btn-sm" onclick="confirmDelete('accounts',${a.id},'${a.name.replace(/'/g,"\\'")}')">Delete</button>
+          <button class="btn btn-sapphire btn-sm" onclick="editAccount(${a.id})">Edit</button>
+          <button class="btn btn-ruby btn-sm" onclick="confirmDelete('accounts',${a.id},'${a.name.replace(/'/g,"\\'")}')">Delete</button>
         </div></td>
       </tr>`).join('');
     if (ROLE !== 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
   } catch(e) { toast('Failed to load accounts: ' + e.message, 'error'); }
 }
-
 async function editAccount(id) {
   try {
     const a = await api.getAccount(id);
@@ -613,20 +1056,15 @@ function resetTxnForm() {
   document.getElementById('txn-modal-title').textContent = 'New Transaction';
   editingId['txn-modal'] = null;
 }
-
 async function populateAccountSelects() {
   try {
     const accounts = await api.getAccounts();
     const opts = accounts.length
       ? accounts.map(a => `<option value="${a.id}">${a.name} (${fmt(a.balance)})</option>`).join('')
       : '<option value="">No accounts available</option>';
-    ['txn-account','transfer-from','transfer-to'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = opts;
-    });
+    ['txn-account','transfer-from','transfer-to'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts; });
   } catch(e) { toast('Could not load accounts', 'warning'); }
 }
-
 async function saveTransaction() {
   const accountId   = parseInt(document.getElementById('txn-account').value);
   const type        = document.getElementById('txn-type').value;
@@ -644,7 +1082,6 @@ async function saveTransaction() {
   } catch(e) { toast('Error: ' + e.message, 'error'); }
   finally { setLoading('btn-save-txn', false); }
 }
-
 async function doTransfer() {
   const fromAccountId = parseInt(document.getElementById('transfer-from').value);
   const toAccountId   = parseInt(document.getElementById('transfer-to').value);
@@ -664,32 +1101,27 @@ async function doTransfer() {
   } catch(e) { toast('Transfer failed: ' + e.message, 'error'); }
   finally { setLoading('btn-save-transfer', false); }
 }
-
 async function renderTransactions() {
   const q     = document.getElementById('txn-search')?.value.toLowerCase() || '';
   const typeF = document.getElementById('txn-filter')?.value || '';
   const tbody = document.getElementById('txn-list');
   try {
     const accounts = await api.getAccounts();
-    const accMap   = {};
-    accounts.forEach(a => accMap[a.id] = a.name);
+    const accMap   = {}; accounts.forEach(a => accMap[a.id] = a.name);
     let data = await api.getTransactions(typeF || null);
-    data = data.filter(t => {
-      const accName = (accMap[t.accountId]||'').toLowerCase();
-      return !q || (t.description||'').toLowerCase().includes(q) || accName.includes(q) || (t.ref||'').toLowerCase().includes(q);
-    });
+    data = data.filter(t => { const an = (accMap[t.accountId]||'').toLowerCase(); return !q || (t.description||'').toLowerCase().includes(q) || an.includes(q) || (t.ref||'').toLowerCase().includes(q); });
     if (!data.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⇄</div><div class="empty-title">No transactions yet</div></div></td></tr>`; return; }
     tbody.innerHTML = data.map(t => `
       <tr>
         <td class="ledger-ref">${t.ref||'-'}</td>
         <td>${badge(t.type)}</td>
         <td style="font-size:13px">${accMap[t.accountId]||'Unknown'}</td>
-        <td style="font-size:13px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.description||'-'}</td>
-        <td class="${t.amount>=0?'amount-positive':'amount-negative'}">${t.amount>=0?'+':''}${fmt(t.amount)}</td>
+        <td style="font-size:13px;color:var(--smoke);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.description||'-'}</td>
+        <td class="${t.amount>=0?'amount-pos':'amount-neg'}">${t.amount>=0?'+':''}${fmt(t.amount)}</td>
         <td class="td-mono">${fmtDate(t.createdAt)}</td>
         <td>${badge(t.status)}</td>
         <td class="admin-only"><div class="action-row">
-          <button class="btn btn-red btn-sm" onclick="confirmDelete('transactions',${t.id},'${(t.ref||'#'+t.id).replace(/'/g,"\\'")}')">Delete</button>
+          <button class="btn btn-ruby btn-sm" onclick="confirmDelete('transactions',${t.id},'${(t.ref||'#'+t.id).replace(/'/g,"\\'")}')">Delete</button>
         </div></td>
       </tr>`).join('');
     if (ROLE !== 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
@@ -704,13 +1136,12 @@ function resetProductForm() {
   document.getElementById('product-modal-title').textContent = 'New Product';
   editingId['product-modal'] = null;
 }
-
 async function saveProduct() {
-  const name        = document.getElementById('prod-name').value.trim();
-  const category    = document.getElementById('prod-category').value;
-  const price       = parseFloat(document.getElementById('prod-price').value) || 0;
-  const stock       = parseInt(document.getElementById('prod-stock').value) || 0;
-  const status      = document.getElementById('prod-status').value;
+  const name = document.getElementById('prod-name').value.trim();
+  const category = document.getElementById('prod-category').value;
+  const price    = parseFloat(document.getElementById('prod-price').value) || 0;
+  const stock    = parseInt(document.getElementById('prod-stock').value) || 0;
+  const status   = document.getElementById('prod-status').value;
   const description = document.getElementById('prod-desc').value.trim() || null;
   if (!name) { toast('Product name is required', 'error'); return; }
   setLoading('btn-save-product', true);
@@ -722,9 +1153,8 @@ async function saveProduct() {
   } catch(e) { toast('Error: ' + e.message, 'error'); }
   finally { setLoading('btn-save-product', false); }
 }
-
 async function renderProducts() {
-  const q     = document.getElementById('product-search')?.value.toLowerCase() || '';
+  const q = document.getElementById('product-search')?.value.toLowerCase() || '';
   const tbody = document.getElementById('product-list');
   try {
     const data = (await api.getProducts()).filter(p => p.name.toLowerCase().includes(q) || p.category.includes(q));
@@ -732,24 +1162,22 @@ async function renderProducts() {
     tbody.innerHTML = data.map(p => `
       <tr>
         <td class="td-mono">#${p.id}</td>
-        <td style="font-weight:500">${p.name}</td>
+        <td class="td-strong">${p.name}</td>
         <td>${badge(p.category)}</td>
-        <td class="amount-positive">${fmt(p.price)}</td>
+        <td class="amount-pos">${fmt(p.price)}</td>
         <td class="td-mono">${p.stock}</td>
         <td>${badge(p.status)}</td>
         <td class="admin-only"><div class="action-row">
-          <button class="btn btn-blue btn-sm" onclick="editProduct(${p.id})">Edit</button>
-          <button class="btn btn-red btn-sm" onclick="confirmDelete('products',${p.id},'${p.name.replace(/'/g,"\\'")}')">Delete</button>
+          <button class="btn btn-sapphire btn-sm" onclick="editProduct(${p.id})">Edit</button>
+          <button class="btn btn-ruby btn-sm" onclick="confirmDelete('products',${p.id},'${p.name.replace(/'/g,"\\'")}')">Delete</button>
         </div></td>
       </tr>`).join('');
     if (ROLE !== 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
   } catch(e) { toast('Failed to load products: ' + e.message, 'error'); }
 }
-
 async function editProduct(id) {
   try {
-    const data = await api.getProducts();
-    const p    = data.find(x => x.id === id);
+    const data = await api.getProducts(); const p = data.find(x => x.id === id);
     if (!p) throw new Error('Not found');
     document.getElementById('prod-name').value     = p.name;
     document.getElementById('prod-category').value = p.category;
@@ -769,7 +1197,6 @@ function resetCustomerForm() {
   document.getElementById('customer-modal-title').textContent = 'New Customer';
   editingId['customer-modal'] = null;
 }
-
 async function saveCustomer() {
   const firstName = document.getElementById('cust-fname').value.trim();
   const lastName  = document.getElementById('cust-lname').value.trim();
@@ -786,36 +1213,30 @@ async function saveCustomer() {
   } catch(e) { toast('Error: ' + e.message, 'error'); }
   finally { setLoading('btn-save-customer', false); }
 }
-
 async function renderCustomers() {
-  const q     = document.getElementById('customer-search')?.value.toLowerCase() || '';
+  const q = document.getElementById('customer-search')?.value.toLowerCase() || '';
   const tbody = document.getElementById('customer-list');
   try {
-    const data = (await api.getCustomers()).filter(c =>
-      `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
-      (c.email||'').toLowerCase().includes(q) ||
-      (c.city||'').toLowerCase().includes(q));
+    const data = (await api.getCustomers()).filter(c => `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q) || (c.city||'').toLowerCase().includes(q));
     if (!data.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">◯</div><div class="empty-title">No customers yet</div></div></td></tr>`; return; }
     tbody.innerHTML = data.map(c => `
       <tr>
         <td class="td-mono">#${c.id}</td>
-        <td style="font-weight:500">${c.firstName} ${c.lastName}</td>
-        <td style="color:var(--blue)">${c.email||'-'}</td>
+        <td class="td-strong">${c.firstName} ${c.lastName}</td>
+        <td style="color:var(--sapphire);font-size:13px">${c.email||'-'}</td>
         <td class="td-mono">${c.phone||'-'}</td>
         <td>${c.city||'-'}</td>
         <td class="admin-only"><div class="action-row">
-          <button class="btn btn-blue btn-sm" onclick="editCustomer(${c.id})">Edit</button>
-          <button class="btn btn-red btn-sm" onclick="confirmDelete('customers',${c.id},'${c.firstName} ${c.lastName}')">Delete</button>
+          <button class="btn btn-sapphire btn-sm" onclick="editCustomer(${c.id})">Edit</button>
+          <button class="btn btn-ruby btn-sm" onclick="confirmDelete('customers',${c.id},'${c.firstName} ${c.lastName}')">Delete</button>
         </div></td>
       </tr>`).join('');
     if (ROLE !== 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
   } catch(e) { toast('Failed to load customers: ' + e.message, 'error'); }
 }
-
 async function editCustomer(id) {
   try {
-    const data = await api.getCustomers();
-    const c    = data.find(x => x.id === id);
+    const data = await api.getCustomers(); const c = data.find(x => x.id === id);
     if (!c) throw new Error('Not found');
     document.getElementById('cust-fname').value = c.firstName;
     document.getElementById('cust-lname').value = c.lastName;
@@ -860,14 +1281,12 @@ async function updateDashboardStats() {
     document.getElementById('db-stats-label').textContent = `SQLite · ${stats.accounts + stats.transactions + stats.products} records`;
   } catch(e) { document.getElementById('db-stats-label').textContent = 'Stats unavailable'; }
 }
-
 async function renderDashboard() {
   await updateDashboardStats();
   try {
     const transactions = (await api.getTransactions()).slice(0, 8);
     const accounts     = await api.getAccounts();
-    const accMap       = {};
-    accounts.forEach(a => accMap[a.id] = a.name);
+    const accMap       = {}; accounts.forEach(a => accMap[a.id] = a.name);
     const tbody = document.getElementById('dashboard-txn-list');
     if (!transactions.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-title">No transactions yet</div></div></td></tr>`; return; }
     tbody.innerHTML = transactions.map(t => `
@@ -875,14 +1294,14 @@ async function renderDashboard() {
         <td class="ledger-ref">${t.ref||'-'}</td>
         <td>${badge(t.type)}</td>
         <td style="font-size:13px">${accMap[t.accountId]||'Unknown'}</td>
-        <td class="${t.amount>=0?'amount-positive':'amount-negative'}">${t.amount>=0?'+':''}${fmt(t.amount)}</td>
+        <td class="${t.amount>=0?'amount-pos':'amount-neg'}">${t.amount>=0?'+':''}${fmt(t.amount)}</td>
         <td class="td-mono">${fmtDate(t.createdAt)}</td>
         <td>${badge(t.status)}</td>
       </tr>`).join('');
   } catch(e) { toast('Could not load dashboard', 'warning'); }
 }
 
-// ==================== CONNECTION CHECK ====================
+// ==================== CONNECTION ====================
 async function checkConnection() {
   try {
     await api.getStats();
@@ -895,10 +1314,7 @@ async function checkConnection() {
 }
 
 // ==================== INIT ====================
-(async () => {
-  await checkConnection();
-  renderDashboard();
-})();
+(async () => { await checkConnection(); renderDashboard(); })();
 </script>
 </body>
 </html>
