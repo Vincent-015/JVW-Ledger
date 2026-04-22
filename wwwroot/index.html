@@ -204,6 +204,8 @@
     min-height: 100vh;
     padding: 34px 38px;
     min-width: 0;
+    width: calc(100% - var(--sidebar-w));
+    max-width: 100%;
   }
 
   .page-header {
@@ -227,9 +229,14 @@
 
   /* Stats row */
   .stats-row {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 14px; margin-bottom: 26px;
-  }
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 14px;
+  margin-bottom: 26px;
+}
 
   .stat-card {
     background: var(--card);
@@ -269,6 +276,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden; margin-bottom: 20px;
+    width: 100%;
   }
 
   .card-header {
@@ -399,6 +407,72 @@
 
   .action-row { display: flex; gap: 6px; align-items: center; }
   .ledger-ref { font-family: var(--font-mono); font-size: 11px; color: var(--smoke); }
+
+  /* ── TRANSACTIONS TWO-COLUMN LAYOUT ── */
+  .txn-layout {
+    display: grid;
+   grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+
+  gap: 18px;
+  align-items: start;
+}
+
+  .txn-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: sticky;
+    top: 24px;
+  }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .summary-card-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 9.5px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--cyan-light);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .summary-card-body { padding: 14px 16px; }
+
+  .sum-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+  }
+  .sum-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .sum-row:first-child { padding-top: 0; }
+
+  .sum-label { color: var(--smoke); font-size: 12.5px; display: flex; align-items: center; gap: 6px; }
+  .sum-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .sum-value { font-family: var(--font-mono); font-size: 12.5px; font-weight: 500; }
+
+  .sum-big {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .sum-big:last-child { border-bottom: none; padding-bottom: 0; }
+  .sum-big:first-child { padding-top: 0; }
+  .sum-big-label { font-size: 11px; color: var(--smoke); font-family: var(--font-mono); letter-spacing: 0.5px; }
+  .sum-big-value { font-size: 20px; font-weight: 700; line-height: 1; }
+
+  .type-bar-wrap { margin-top: 4px; }
+  .type-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .type-bar-row:last-child { margin-bottom: 0; }
+  .type-bar-label { font-size: 11.5px; color: var(--smoke); width: 72px; flex-shrink: 0; }
+  .type-bar-track { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .type-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  .type-bar-count { font-family: var(--font-mono); font-size: 11px; color: var(--smoke); width: 20px; text-align: right; flex-shrink: 0; }
 
   /* ── MODALS ───────────────────────────────── */
   .modal-overlay {
@@ -678,29 +752,112 @@
           <button class="btn btn-gold admin-only" onclick="openModal('txn-modal'); resetTxnForm()">+ New Transaction</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="toolbar">
-            <div class="search-wrap">
-              <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-              <input type="text" id="txn-search" placeholder="Search transactions…" oninput="renderTransactions()">
+
+      <div class="txn-layout">
+        <!-- Left: main table -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="toolbar">
+                <div class="search-wrap">
+                  <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+                  <input type="text" id="txn-search" placeholder="Search transactions…" oninput="renderTransactions()">
+                </div>
+                <select id="txn-filter" class="filter-select" onchange="renderTransactions()">
+                  <option value="">All Types</option>
+                  <option value="DEPOSIT">Deposit</option>
+                  <option value="wITHDRAWAL">Withdrawal</option>
+                  <option value="TRANSFER">Transfer</option>
+                  <option value="PAYMENT">Payment</option>
+                </select>
+              </div>
             </div>
-            <select id="txn-filter" class="filter-select" onchange="renderTransactions()">
-              <option value="">All Types</option>
-              <option value="DEPOSIT">Deposit</option>
-              <option value="wITHDRAWAL">Withdrawal</option>
-              <option value="TRANSFER">Transfer</option>
-              <option value="PAYMENT">Payment</option>
-            </select>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Ref #</th><th>Type</th><th>Account</th><th>Description</th><th>Amount</th><th>Date</th><th>Status</th><th class="admin-only">Actions</th></tr></thead>
+                <tbody id="txn-list"></tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <div class="tbl-wrap">
-          <table>
-            <thead><tr><th>Ref #</th><th>Type</th><th>Account</th><th>Description</th><th>Amount</th><th>Date</th><th>Status</th><th class="admin-only">Actions</th></tr></thead>
-            <tbody id="txn-list"></tbody>
-          </table>
-        </div>
-      </div>
+
+        <!-- Right: summary panel -->
+        <div class="txn-sidebar">
+
+          <!-- Flow summary -->
+          <div class="summary-card">
+            <div class="summary-card-header">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              Cash Flow
+            </div>
+            <div class="summary-card-body">
+              <div class="sum-big">
+                <div class="sum-big-label">TOTAL IN</div>
+                <div class="sum-big-value" id="sum-total-in" style="color:var(--emerald)">—</div>
+              </div>
+              <div class="sum-big">
+                <div class="sum-big-label">TOTAL OUT</div>
+                <div class="sum-big-value" id="sum-total-out" style="color:#ff7b7b">—</div>
+              </div>
+              <div class="sum-big" style="padding-bottom:0">
+                <div class="sum-big-label">NET</div>
+                <div class="sum-big-value" id="sum-net" style="color:var(--cyan)">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Type breakdown -->
+          <div class="summary-card">
+            <div class="summary-card-header">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              By Type
+            </div>
+            <div class="summary-card-body">
+              <div class="type-bar-wrap" id="sum-type-bars">
+                <!-- filled by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Account balances -->
+          <div class="summary-card">
+            <div class="summary-card-header">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              Account Balances
+            </div>
+            <div class="summary-card-body" id="sum-accounts">
+              <!-- filled by JS -->
+            </div>
+          </div>
+
+          <!-- Quick count -->
+          <div class="summary-card">
+            <div class="summary-card-header">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              Record Count
+            </div>
+            <div class="summary-card-body">
+              <div class="sum-row">
+                <span class="sum-label">Showing</span>
+                <span class="sum-value" id="sum-showing" style="color:var(--white)">—</span>
+              </div>
+              <div class="sum-row">
+                <span class="sum-label">Completed</span>
+                <span class="sum-value" style="color:var(--emerald)" id="sum-completed">—</span>
+              </div>
+              <div class="sum-row">
+                <span class="sum-label">Pending</span>
+                <span class="sum-value" style="color:var(--amber)" id="sum-pending">—</span>
+              </div>
+              <div class="sum-row" style="border:none;padding-bottom:0">
+                <span class="sum-label">Failed</span>
+                <span class="sum-value" style="color:#ff7b7b" id="sum-failed">—</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /txn-sidebar -->
+      </div><!-- /txn-layout -->
     </div>
 
     <!-- PRODUCTS -->
@@ -1107,15 +1264,15 @@ async function renderTransactions() {
   const tbody = document.getElementById('txn-list');
   try {
     const accounts = await api.getAccounts();
-    const accMap   = {}; accounts.forEach(a => accMap[a.id] = a.name);
+    const accMap   = {}; accounts.forEach(a => accMap[a.id] = a);
     let data = await api.getTransactions(typeF || null);
-    data = data.filter(t => { const an = (accMap[t.accountId]||'').toLowerCase(); return !q || (t.description||'').toLowerCase().includes(q) || an.includes(q) || (t.ref||'').toLowerCase().includes(q); });
-    if (!data.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⇄</div><div class="empty-title">No transactions yet</div></div></td></tr>`; return; }
+    data = data.filter(t => { const an = (accMap[t.accountId]?.name||'').toLowerCase(); return !q || (t.description||'').toLowerCase().includes(q) || an.includes(q) || (t.ref||'').toLowerCase().includes(q); });
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⇄</div><div class="empty-title">No transactions yet</div></div></td></tr>`; updateTxnSummary([], accounts); return; }
     tbody.innerHTML = data.map(t => `
       <tr>
         <td class="ledger-ref">${t.ref||'-'}</td>
         <td>${badge(t.type)}</td>
-        <td style="font-size:13px">${accMap[t.accountId]||'Unknown'}</td>
+        <td style="font-size:13px">${accMap[t.accountId]?.name||'Unknown'}</td>
         <td style="font-size:13px;color:var(--smoke);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.description||'-'}</td>
         <td class="${t.amount>=0?'amount-pos':'amount-neg'}">${t.amount>=0?'+':''}${fmt(t.amount)}</td>
         <td class="td-mono">${fmtDate(t.createdAt)}</td>
@@ -1125,7 +1282,55 @@ async function renderTransactions() {
         </div></td>
       </tr>`).join('');
     if (ROLE !== 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    updateTxnSummary(data, accounts);
   } catch(e) { toast('Failed to load transactions: ' + e.message, 'error'); }
+}
+
+function updateTxnSummary(data, accounts) {
+  const totalIn  = data.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+  const totalOut = data.filter(t => t.amount < 0).reduce((s, t) => s + t.amount, 0);
+  const net      = totalIn + totalOut;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('sum-total-in',  fmt(totalIn));
+  set('sum-total-out', fmt(Math.abs(totalOut)));
+  set('sum-net',       (net >= 0 ? '+' : '') + fmt(net));
+  document.getElementById('sum-net').style.color = net >= 0 ? 'var(--emerald)' : '#ff7b7b';
+
+  // Status counts
+  set('sum-showing',   data.length);
+  set('sum-completed', data.filter(t => t.status === 'completed').length);
+  set('sum-pending',   data.filter(t => t.status === 'pending').length);
+  set('sum-failed',    data.filter(t => t.status === 'failed').length);
+
+  // Type bars
+  const types = ['deposit','withdrawal','transfer','payment'];
+  const typeColors = { deposit:'var(--emerald)', withdrawal:'#ff7b7b', transfer:'var(--sapphire)', payment:'var(--amber)' };
+  const typeCounts = {};
+  types.forEach(t => typeCounts[t] = 0);
+  data.forEach(t => { const k = t.type?.toLowerCase(); if (typeCounts[k] !== undefined) typeCounts[k]++; });
+  const maxCount = Math.max(1, ...Object.values(typeCounts));
+  const barsEl = document.getElementById('sum-type-bars');
+  if (barsEl) {
+    barsEl.innerHTML = types.map(t => `
+      <div class="type-bar-row">
+        <div class="type-bar-label">${t}</div>
+        <div class="type-bar-track"><div class="type-bar-fill" style="width:${(typeCounts[t]/maxCount*100).toFixed(0)}%;background:${typeColors[t]}"></div></div>
+        <div class="type-bar-count">${typeCounts[t]}</div>
+      </div>`).join('');
+  }
+
+  // Account balances
+  const accEl = document.getElementById('sum-accounts');
+  if (accEl && accounts.length) {
+    accEl.innerHTML = accounts.slice(0, 5).map(a => `
+      <div class="sum-row">
+        <span class="sum-label" style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.name}</span>
+        <span class="sum-value" style="color:${a.balance>=0?'var(--emerald)':'#ff7b7b'}">${fmt(a.balance)}</span>
+      </div>`).join('');
+  } else if (accEl) {
+    accEl.innerHTML = '<div style="color:var(--smoke);font-size:12px;text-align:center;padding:8px 0">No accounts</div>';
+  }
 }
 
 // ==================== PRODUCTS ====================

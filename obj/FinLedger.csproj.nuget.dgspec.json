@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\HH830\\Desktop\\JVW-Ledger\\FinLedger.csproj": {}
+    "C:\\Users\\UU324\\JVW-Ledger\\FinLedger.csproj": {}
   },
   "projects": {
-    "C:\\Users\\HH830\\Desktop\\JVW-Ledger\\FinLedger.csproj": {
+    "C:\\Users\\UU324\\JVW-Ledger\\FinLedger.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\HH830\\Desktop\\JVW-Ledger\\FinLedger.csproj",
+        "projectUniqueName": "C:\\Users\\UU324\\JVW-Ledger\\FinLedger.csproj",
         "projectName": "FinLedger",
-        "projectPath": "C:\\Users\\HH830\\Desktop\\JVW-Ledger\\FinLedger.csproj",
-        "packagesPath": "C:\\Users\\HH830\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\HH830\\Desktop\\JVW-Ledger\\obj\\",
+        "projectPath": "C:\\Users\\UU324\\JVW-Ledger\\FinLedger.csproj",
+        "packagesPath": "C:\\Users\\UU324\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\UU324\\JVW-Ledger\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HH830\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\UU324\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
